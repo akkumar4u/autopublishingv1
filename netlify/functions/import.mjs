@@ -19,7 +19,11 @@ export default async request => {
     const { url = '' } = await request.json();
     const { googleExportUrl, parseDealerTemplate } = await publishing();
     const response = await fetch(googleExportUrl(url));
-    if (!response.ok) throw new Error('Cannot read Google Doc');
+    if (!response.ok) {
+      throw new Error(
+        `Google Docs returned HTTP ${response.status}. Confirm the document is shared as “Anyone with the link” → Viewer, then try again.`
+      );
+    }
     return json(parseDealerTemplate(await response.text()));
   } catch (error) {
     console.error('Import error:', error.message);

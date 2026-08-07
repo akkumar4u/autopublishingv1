@@ -322,8 +322,11 @@ app.post('/api/import', async (req, res) => {
     const exportUrl = googleExportUrl(req.body.url || '');
     const response = await fetch(exportUrl);
 
-    if (!response.ok)
-      throw new Error('Cannot read Google Doc');
+    if (!response.ok) {
+      throw new Error(
+        `Google Docs returned HTTP ${response.status}. Confirm the document is shared as “Anyone with the link” → Viewer, then try again.`
+      );
+    }
 
     const data = parseDealerTemplate(await response.text());
     res.json(data);
