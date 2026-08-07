@@ -92,8 +92,10 @@ function App() {
       const response = await fetch('/api/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: importUrl }) });
       const raw = await response.text();
       let data;
-      try { data = JSON.parse(raw); } catch { throw new Error('Server returned an invalid response.'); }
-      if (!response.ok) throw new Error(data.error);
+      try { data = raw ? JSON.parse(raw) : {}; } catch {
+        throw new Error(`Import failed (HTTP ${response.status}): Netlify did not return a valid function response.`);
+      }
+      if (!response.ok) throw new Error(`Import failed (HTTP ${response.status}): ${data.error || 'No error details were returned.'}`);
       setPost(current => ({
         ...current,
         ...data,
